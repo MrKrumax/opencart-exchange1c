@@ -11,20 +11,21 @@ use Exchange1C\Plugin\Plugin;
 class TranslitPlugin extends Plugin {
 
 	/**
-	 * Таблица транслитерации.
+	 * Таблица транслитерации
+	 *
 	 * @var array
 	 */
 	private $table = array();
 
 	/**
-	 * Идентификатор языка по умолчанию.
+	 * Идентификатор языка по умолчанию
+	 *
 	 * @var int
 	 */
 	private $languageId;
 
-
 	/**
-	 * Инициализация плагина.
+	 * Инициализация плагина
 	 *
 	 * @return void
 	 */
@@ -37,11 +38,10 @@ class TranslitPlugin extends Plugin {
 		$this->addEventListener('beforeAddProduct', 'translitProduct');
 	}
 
-
 	/**
-	 * Транслитерация имени категории.
-	 * @event beforeAddCategory
+	 * Транслитерация имени категории
 	 *
+	 * @event beforeAddCategory
 	 * @param string $category1cId
 	 * @param array &$categoryData
 	 * @return void
@@ -56,18 +56,17 @@ class TranslitPlugin extends Plugin {
 				$this->translit($categoryName)
 			);
 
-			if (!$this->hasDuplicate($keyword))
+			if ( ! $this->hasDuplicate($keyword))
 			{
 				$categoryData['keyword'] = $keyword;
 			}
 		}
 	}
 
-
 	/**
-	 * Транслитерация имени товара.
-	 * @event beforeAddProduct
+	 * Транслитерация имени товара
 	 *
+	 * @event beforeAddProduct
 	 * @param string $product1cId
 	 * @param array &$productData
 	 * @return void
@@ -82,16 +81,15 @@ class TranslitPlugin extends Plugin {
 				$this->translit($productName)
 			);
 			
-			if (!$this->hasDuplicate($keyword))
+			if ( ! $this->hasDuplicate($keyword))
 			{
 				$productData['keyword'] = $keyword;
 			}
 		}
 	}
 
-
 	/**
-	 * Транслитерация строки.
+	 * Транслитерация строки
 	 *
 	 * @param string $string
 	 * @return string
@@ -100,7 +98,7 @@ class TranslitPlugin extends Plugin {
 	{
 		$output = $string;
 
-		if (is_array($this->table) && !empty($this->table))
+		if (is_array($this->table) && ! empty($this->table))
 		{
 			$output = strtr($string, $this->table);
 		}
@@ -108,9 +106,8 @@ class TranslitPlugin extends Plugin {
 		return $output;
 	}
 
-
 	/**
-	 * Проверка дубликатов URL.
+	 * Проверка дубликатов URL
 	 *
 	 * @param string $keyword
 	 * @return bool
@@ -126,9 +123,8 @@ class TranslitPlugin extends Plugin {
 		return false;
 	}
 
-
 	/**
-	 * Получение таблицы транслитерации.
+	 * Получение таблицы транслитерации
 	 *
 	 * @return array
 	 */
@@ -173,9 +169,8 @@ class TranslitPlugin extends Plugin {
 		);
 	}
 
-
 	/**
-	 * Очистка строки от ненужных символов.
+	 * Очистка строки от ненужных символов
 	 *
 	 * @param string $string
 	 * @return string

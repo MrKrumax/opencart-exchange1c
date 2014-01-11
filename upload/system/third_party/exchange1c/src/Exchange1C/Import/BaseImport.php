@@ -7,23 +7,21 @@ use Exchange1C\Plugin\PluginManager;
 class BaseImport {
 
 	/**
-	 * OpenCart language ids.
+	 * OpenCart language ids
 	 *
 	 * @var array
 	 */
 	protected $languageIds = array();
 
-
 	/**
-	 * Plugin manager instance.
+	 * Plugin manager instance
 	 *
 	 * @var PluginManager
 	 */
 	protected $pluginManager;
 
-
 	/**
-	 * Class constructor.
+	 * Class constructor
 	 *
 	 * @param Registry $registry
 	 * @return void

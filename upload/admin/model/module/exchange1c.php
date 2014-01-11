@@ -1,18 +1,16 @@
 <?php
 
-
 class ModelModuleExchange1C extends Model {
 
 	/**
-	 * Table prefix.
+	 * Table prefix
 	 *
 	 * @var string
 	 */
 	protected $dbPrefix = DB_PREFIX;
-	
 
 	/**
-	 * Create tables on install module.
+	 * Create tables on install module
 	 *
 	 * @return void
 	 */
@@ -35,9 +33,8 @@ class ModelModuleExchange1C extends Model {
 		");
 	}
 
-
 	/**
-	 * Drop tables on uninstall modules.
+	 * Drop tables on uninstall modules
 	 *
 	 * @return void
 	 */
@@ -47,9 +44,8 @@ class ModelModuleExchange1C extends Model {
 		$this->db->query("DROP TABLE {$this->dbPrefix}product_to_1c");
 	}
 
-
 	/**
-	 * Get categories relations to 1C.
+	 * Get categories relations to 1C
 	 *
 	 * @return array
 	 */
@@ -63,7 +59,7 @@ class ModelModuleExchange1C extends Model {
 		{
 			$category1cId = $row['category_1c_id'];
 
-			if (!empty($category1cId))
+			if ( ! empty($category1cId))
 			{
 				$result[$category1cId] = $row['category_id'];
 			}
@@ -72,9 +68,8 @@ class ModelModuleExchange1C extends Model {
 		return $result;
 	}
 
-
 	/**
-	 * Get products relations to 1C.
+	 * Get products relations to 1C
 	 *
 	 * @return void
 	 */
@@ -88,7 +83,7 @@ class ModelModuleExchange1C extends Model {
 		{
 			$product1cId = $row['product_1c_id'];
 
-			if (!empty($product1cId))
+			if ( ! empty($product1cId))
 			{
 				$result[$product1cId] = $row['product_id'];
 			}
@@ -97,9 +92,8 @@ class ModelModuleExchange1C extends Model {
 		return $result;
 	}
 
-
 	/**
-	 * Save categories relations.
+	 * Save categories relations
 	 *
 	 * @param array $links
 	 * @return void
@@ -114,9 +108,8 @@ class ModelModuleExchange1C extends Model {
 		}
 	}
 
-
 	/**
-	 * Save products relations.
+	 * Save products relations
 	 *
 	 * @param array $links
 	 * @return void
@@ -131,9 +124,8 @@ class ModelModuleExchange1C extends Model {
 		}
 	}
 
-
 	/**
-	 * Delete categories relations.
+	 * Delete categories relations
 	 *
 	 * @return void
 	 */
@@ -142,9 +134,8 @@ class ModelModuleExchange1C extends Model {
 		$this->db->query("TRUNCATE TABLE {$this->dbPrefix}category_to_1c");
 	}
 
-
 	/**
-	 * Delete products relations.
+	 * Delete products relations
 	 *
 	 * @return void
 	 */
@@ -152,4 +143,5 @@ class ModelModuleExchange1C extends Model {
 	{
 		$this->db->query("TRUNCATE TABLE {$this->dbPrefix}product_to_1c");
 	}
+
 }

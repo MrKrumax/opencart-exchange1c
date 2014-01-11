@@ -7,31 +7,28 @@ use Exchange1C\Log;
 class CategoryImport extends BaseImport {
 
 	/**
-	 * OpenCart model for categories.
+	 * OpenCart model for categories
 	 *
 	 * @var ModelCatalogCategory
 	 */
 	private $categoryModel;
-
 	
 	/**
-	 * OpenCart model for Exchange1C module.
+	 * OpenCart model for Exchange1C module
 	 *
 	 * @var ModelModuleExchange1C
 	 */
 	private $exchangeModel;
-
 	
 	/**
-	 * 1C categories to OpenCart categories relations.
+	 * 1C categories to OpenCart categories relations
 	 *
 	 * @var array
 	 */
 	private $categoryMap = array();
 
-
 	/**
-	 * Class constructor.
+	 * Class constructor
 	 *
 	 * @param Registry $registry
 	 * @return void
@@ -46,9 +43,8 @@ class CategoryImport extends BaseImport {
 		$this->categoryMap = $this->exchangeModel->getCategoriesMaps();
 	}
 
-
 	/**
-	 * Class destuctor.
+	 * Class destuctor
 	 *
 	 * @return void
 	 */
@@ -57,9 +53,8 @@ class CategoryImport extends BaseImport {
 		$this->exchangeModel->setCategoriesMaps($this->categoryMap);
 	}
 
-
 	/**
-	 * Import.xml entry point.
+	 * Import.xml entry point
 	 * 
 	 * @param string $importFile
 	 * @return void
@@ -77,9 +72,8 @@ class CategoryImport extends BaseImport {
 		}
 	}
 
-
 	/**
-	 * Categories parser.
+	 * Categories parser
 	 *
 	 * @param SimpleXMLElement $importXml
 	 * @return void
@@ -88,7 +82,7 @@ class CategoryImport extends BaseImport {
 	{
 		foreach ($xmlCategories->Группа as $xmlCategory)
 		{
-			$category1cId = (string)$xmlCategory->Ид;
+			$category1cId = (string) $xmlCategory->Ид;
 
 			if (isset($this->categoryMap[$category1cId]))
 			{
@@ -114,9 +108,8 @@ class CategoryImport extends BaseImport {
 		}
 	}
 
-	
 	/**
-	 * Create category and link.
+	 * Create category and link
 	 *
 	 * @param string $category1cId
 	 * @param array $categoryData
@@ -140,9 +133,8 @@ class CategoryImport extends BaseImport {
 		return $categoryId;
 	}
 
-
 	/**
-	 * Edit category.
+	 * Edit category
 	 *
 	 * @param int $categoryId
 	 * @param array $categoryData
@@ -162,9 +154,8 @@ class CategoryImport extends BaseImport {
 		Log::debug("Edit category: {$categoryId}");
 	}
 
-
 	/**
-	 * Get all data of the category.
+	 * Get all data of the category
 	 *
 	 * @param int $categoryId
 	 * @return array
@@ -177,9 +168,8 @@ class CategoryImport extends BaseImport {
 		return $categoryData;
 	}
 
-
 	/**
-	 * Compare and build new data for category.
+	 * Compare and build new data for category
 	 *
 	 * @param SimpleXMLElement $xmlCategory
 	 * @param array $oldData
@@ -209,4 +199,5 @@ class CategoryImport extends BaseImport {
 
 		return $newData;
 	}
+
 }

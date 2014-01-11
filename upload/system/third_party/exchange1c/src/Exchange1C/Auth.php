@@ -3,7 +3,7 @@
 class Auth {
 
 	/**
-	 * Attempt authentication.
+	 * Attempt authentication
 	 *
 	 * @param string $username
 	 * @param string $password
@@ -20,9 +20,8 @@ class Auth {
 		return false;
 	}
 
-
 	/**
-	 * Check authentication.
+	 * Check authentication
 	 *
 	 * @return bool
 	 */

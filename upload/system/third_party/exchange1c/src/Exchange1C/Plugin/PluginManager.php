@@ -6,23 +6,21 @@ use Exchange1C\Log;
 class PluginManager {
 
 	/**
-	 * Event map for plugins.
+	 * Event map for plugins
 	 *
 	 * @var array
 	 */
 	protected $eventMap = array();
 
-
 	/**
-	 * Directory for plugins.
+	 * Directory for plugins
 	 *
 	 * @var string
 	 */
 	protected $pluginsDir;
 
-
 	/**
-	 * Class constructor.
+	 * Class constructor
 	 *
 	 * @param string $dir
 	 * @return void
@@ -32,9 +30,8 @@ class PluginManager {
 		$this->pluginsDir = $dir;
 	}
 
-
 	/**
-	 * Load plugins from dir.
+	 * Load plugins from dir
 	 *
 	 * @param string $dir
 	 * @return void
@@ -65,9 +62,8 @@ class PluginManager {
 		}
 	}
 
-
 	/**
-	 * Register new plugin.
+	 * Register new plugin
 	 *
 	 * @param string $pligunName
 	 * @param string $eventName
@@ -83,9 +79,8 @@ class PluginManager {
 		);
 	}
 
-
 	/**
-	 * Run all plugins on event.
+	 * Run all plugins on event
 	 *
 	 * @param string $event 
 	 * @param array $args

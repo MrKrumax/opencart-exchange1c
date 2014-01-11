@@ -3,38 +3,35 @@
 abstract class Plugin {
 
 	/**
-	 * Plugin events.
+	 * Plugin events
 	 *
 	 * @var array
 	 */
 	public $events = array();
 
-
 	/**
-	 * Active or non active.
+	 * Active or non active
 	 *
 	 * @var bool
 	 */
 	private $active = true;
 
-
 	/**
-	 * OpenCart DB instance.
+	 * OpenCart DB instance
 	 *
 	 * @var DB
 	 */
 	protected $db;
 
-
 	/**
-	 * OpenCart Config instance.
+	 * OpenCart Config instance
+	 *
 	 * @var Config
 	 */
 	protected $config;
 
-
 	/**
-	 * Plugin constructor.
+	 * Plugin constructor
 	 *
 	 * @param Registry $registry
 	 * @return void
@@ -45,9 +42,8 @@ abstract class Plugin {
 		$this->config = $registry->get('config');
 	}
 
-
 	/**
-	 * Add event to plugnin event map.
+	 * Add event to plugnin event map
 	 *
 	 * @param string $event
 	 * @param string $funcName
@@ -56,13 +52,12 @@ abstract class Plugin {
 	{
 		if ($this->active)
 		{
-			$this->events[$event] = $funcName? $funcName : $event;
+			$this->events[$event] = ($funcName)? $funcName : $event;
 		}
 	}
 
-
 	/**
-	 * Disable plugin.
+	 * Disable plugin
 	 *
 	 * @return void
 	 */
@@ -71,11 +66,11 @@ abstract class Plugin {
 		$this->active = false;
 	}
 
-
 	/**
-	 * Init plugin.
+	 * Init plugin
 	 *
 	 * @return void
 	 */
 	abstract function init();
+
 }

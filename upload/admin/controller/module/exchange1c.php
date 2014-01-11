@@ -3,7 +3,7 @@
 class ControllerModuleExchange1C extends Controller {
 
 	/**
-	 * Get module page.
+	 * Get module page
 	 *
 	 * @return void
 	 */
@@ -25,9 +25,10 @@ class ControllerModuleExchange1C extends Controller {
 		$this->showPage($data);
 	}
 
-
 	/**
-	 * Clear relations action.
+	 * Clear relations action
+	 *
+	 * @return void
 	 */
 	public function clearRelations()
 	{
@@ -39,11 +40,10 @@ class ControllerModuleExchange1C extends Controller {
 		$this->redirect($this->url->link('module/exchange1c', 'token=' . $this->session->data['token'], 'SSL'));
 	}
 
-
 	/**
-	 * Install action.
+	 * Install action
 	 *
-	 * @return void.
+	 * @return void
 	 */
 	public function install()
 	{
@@ -51,9 +51,8 @@ class ControllerModuleExchange1C extends Controller {
 		$this->model_module_exchange1c->setTables();
 	}
 
-
 	/**
-	 * Uninstall action.
+	 * Uninstall action
 	 *
 	 * @return void
 	 */
@@ -63,9 +62,8 @@ class ControllerModuleExchange1C extends Controller {
 		$this->model_module_exchange1c->unsetTables();
 	}
 
-
 	/**
-	 * Render module page.
+	 * Render module page
 	 *
 	 * @param array $data
 	 * @return void
@@ -92,9 +90,8 @@ class ControllerModuleExchange1C extends Controller {
 		$this->response->setOutput($this->render(), $this->config->get('config_compression'));
 	}
 
-
 	/**
-	 * Build breadcrumbs.
+	 * Build breadcrumbs
 	 *
 	 * @return array
 	 */
@@ -119,9 +116,8 @@ class ControllerModuleExchange1C extends Controller {
 		);
 	}
 
-
 	/**
-	 * Get config.
+	 * Get config
 	 *
 	 * @param array $keys
 	 * @return array
@@ -138,9 +134,8 @@ class ControllerModuleExchange1C extends Controller {
 		return $result;
 	}
 
-
 	/**
-	 * Get version of module.
+	 * Get version of module
 	 *
 	 * @return string
 	 */
@@ -154,9 +149,8 @@ class ControllerModuleExchange1C extends Controller {
 		}
 	}
 
-
 	/**
-	 * Check for new versions.
+	 * Check for new versions
 	 *
 	 * @return bool
 	 */
@@ -170,14 +164,7 @@ class ControllerModuleExchange1C extends Controller {
 			$this->cache->set('e1c_version', $new);
 		}
 		
-		if (version_compare($this->getVersion(), $new) == -1)
-		{
-			return true;
-		}
-		else
-		{
-			return false;
-		}
+		return (version_compare($this->getVersion(), $new) == -1)? true : false;
 	}
 
 }
