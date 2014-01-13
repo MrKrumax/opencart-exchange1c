@@ -401,6 +401,8 @@ class ModelToolExchange1c extends Model {
 				if ($product->Описание) $data['description'] = (string)$product->Описание;
 				if ($product->Статус) $data['status'] = (string)$product->Статус;
 
+                unset($product_filter);
+
 				// Свойства продукта
 				if ($product->ЗначенияСвойств) {
 					if ($enable_log)
@@ -419,6 +421,10 @@ class ModelToolExchange1c extends Model {
 							else {
 								continue;
 							}
+
+                            $filter_id = $this->getProductFilter($attribute['name'], $attribute_value);
+							$product_filter[$filter_id] = $filter_id;
+
 							if ($enable_log)
 								$this->log->write("   > " . $attribute_value);
 
@@ -499,7 +505,16 @@ class ModelToolExchange1c extends Model {
 					}
 				}
 
+				if (isset($product_filter)) {
+					$data['product_filter'] = $product_filter;
+					$this->log->write(print_r($product_filter, true));
+				}
 				$this->setProduct($data, $language_id);
+				if (isset($product_filter)) {
+					$product_id = $this->getProductIdBy1CProductId ($uuid[0]);
+//					$product_id = $this->get1CProductIdByProductId($product['product_id']);
+					$this->updateProductFilter($product_id, $product_filter);
+				}
 				unset($data);
 			}
 		}
@@ -551,6 +566,7 @@ class ModelToolExchange1c extends Model {
 	 *
 	 * @param	SimpleXMLElement
 	 * @param	int
+
 	 */
 	private function insertCategory($xml, $parent = 0, $language_id) {
 
@@ -753,6 +769,7 @@ class ModelToolExchange1c extends Model {
 			,'main_category_id' => 0
 			,'product_store'    => array(0)
 			,'product_option'   => array()
+			,'product_filter'   => array()
 			,'points'           => (isset($product['points'])) ? $product['points'] : (isset($data['points']) ? $data['points']: 0)
 			,'product_image'    => (isset($product['product_image'])) ? $product['product_image'] : (isset($data['product_image']) ? $data['product_image']: array())
 			,'preview'          => $this->model_tool_image->resize('no_image.jpg', 100, 100)
@@ -955,6 +972,38 @@ class ModelToolExchange1c extends Model {
 		}
 	}
 
+	private function getFilterGroupIdByName($name) {
+		$query = $this->db->query("SELECT filter_group_id FROM `" . DB_PREFIX . "filter_group_description` WHERE `name` = '" . $name . "'");
+		if ($query->num_rows) {
+			return $query->row['filter_group_id'];
+		}
+		else {
+			//Нет такой группы фильтров
+			return false;
+		}
+	}
+
+	private function getFilterIdByName($name, $group_id) {
+
+		if ($group_id === false)
+			return false;
+
+        $this->log->write("Поиск фильтра по имени (". $name . ")");
+		$query = $this->db->query("SELECT filter_id FROM `" . DB_PREFIX . "filter_description` WHERE `name` = '" . $name . "'");
+		if ($query->num_rows) {
+			$this->log->write("ID фильтра " . $query->row['filter_id']);
+			return $query->row['filter_id'];
+		}
+		else {
+			//Нет такого фильтра, добавляем
+			$lang_id = (int)$this->config->get('config_language_id');
+			$this->db->query("INSERT INTO `" . DB_PREFIX . "filter` SET filter_group_id ='" . $group_id . "', sort_order = '0'");
+			$filter_id = $this->db->getLastId();
+			$this->db->query("INSERT INTO " . DB_PREFIX . "filter_description SET filter_id = '" . $filter_id . "', filter_group_id ='" . $group_id . "', language_id = '" . $lang_id . "', name = '" . $this->db->escape($name) . "'");
+			return $filter_id;
+		}
+	}
+
 	/**
 	 * Получает путь к картинке и накладывает водяные знаки
 	 *
@@ -980,6 +1029,38 @@ class ModelToolExchange1c extends Model {
 		}
 		else {
 			return 'no_image.jpg';
+		}
+	}
+
+	/**
+	 * Получает путь к картинке и накладывает водяные знаки
+	 *
+	 * @param	string
+	 * @return	string
+	 */
+	private function getProductFilter($filter_name, $filter_value) {
+		$group_id = $this->getFilterGroupIdByName($filter_name);
+		$filter_id = $this->getFilterIdByName($filter_value, $group_id);
+		return $filter_id;
+	}
+
+	private function updateProductFilter($product_id, $filter) {
+		$this->log->write("updateProductFilter");
+		foreach ($filter as $filter_id) {
+			$this->log->write("обновление фильтров: product_id: " . $product_id . " filter_id: ". $filter_id);
+
+			$query = $this->db->query("SELECT filter_id FROM `" . DB_PREFIX . "product_filter` WHERE filter_id = '" . $filter_id . "' and product_id = '" . $product_id . "'");
+			if ($query->num_rows) {
+				$this->log->write(" фильтр найден ");
+				return false;
+			}
+			else {
+				$this->log->write(" фильтр ненайден, создается новый ");
+				$sqlq = "INSERT INTO `" .DB_PREFIX. "product_filter` SET product_id = '" . $product_id . "', filter_id = '" . $filter_id . "'";
+				$this->db->query($sqlq);
+				$this->log->write($sqlq);
+				return true;
+			}
 		}
 	}
 
