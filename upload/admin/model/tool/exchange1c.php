@@ -4,7 +4,6 @@ class ModelToolExchange1c extends Model {
 
 	private $CATEGORIES = array();
 	private $PROPERTIES = array();
-	private $FILTERS = array();
 
 
 	/**
@@ -294,9 +293,6 @@ class ModelToolExchange1c extends Model {
 
 				$data['status'] = 1;
 
-				$this->log->write("FILTERS:" . print_r($this->FILTERS,true));
-
-				$data['product_filter'] = $this->FILTERS[$product_id];
 				$this->updateProduct($data, $product_id, $language_id);
 
 				unset($data);
@@ -509,16 +505,18 @@ class ModelToolExchange1c extends Model {
 						}
 					}
 				}
-
 				if (isset($product_filter)) {
 					$data['product_filter'] = $product_filter;
-					$this->log->write(print_r($product_filter, true));
 				}
+
 				$this->setProduct($data, $language_id);
+
 				if (isset($product_filter)) {
 					$product_id = $this->getProductIdBy1CProductId ($uuid[0]);
-					$this->insertProductFilter($product_id, $product_filter);
+					$this->insertCategoryFilters($product_id, $product_filter);
 				}
+
+
 				unset($data);
 			}
 		}
@@ -526,6 +524,7 @@ class ModelToolExchange1c extends Model {
 		unset($xml);
 		if ($enable_log)
 			$this->log->write("Окончен разбор файла: " . $filename );
+
 	}
 
 
@@ -711,6 +710,7 @@ class ModelToolExchange1c extends Model {
 			$data = array_merge($data, array('main_category_id' => $this->model_catalog_product->getProductMainCategoryId($product_id)));
 			$data = array_merge($data, array('product_discount' => $this->model_catalog_product->getProductDiscounts($product_id)));
 			$data = array_merge($data, array('product_special' => $this->model_catalog_product->getProductSpecials($product_id)));
+			$data = array_merge($data, array('product_filter' => $this->model_catalog_product->getProductFilters($product_id)));
 			$data = array_merge($data, array('product_download' => $this->model_catalog_product->getProductDownloads($product_id)));
 			$data = array_merge($data, array('product_category' => $this->model_catalog_product->getProductCategories($product_id)));
 			$data = array_merge($data, array('product_store' => $this->model_catalog_product->getProductStores($product_id)));
@@ -772,7 +772,6 @@ class ModelToolExchange1c extends Model {
 			,'main_category_id' => 0
 			,'product_store'    => array(0)
 			,'product_option'   => array()
-			,'product_filter'   => array()
 			,'points'           => (isset($product['points'])) ? $product['points'] : (isset($data['points']) ? $data['points']: 0)
 			,'product_image'    => (isset($product['product_image'])) ? $product['product_image'] : (isset($data['product_image']) ? $data['product_image']: array())
 			,'preview'          => $this->model_tool_image->resize('no_image.jpg', 100, 100)
@@ -783,6 +782,9 @@ class ModelToolExchange1c extends Model {
 			,'product_related'  => (isset($product['product_related'])) ? $product['product_related'] : (isset($data['product_related']) ? $data['product_related']: array())
 			,'product_attribute'    => (isset($product['product_attribute'])) ? $product['product_attribute'] : (isset($data['product_attribute']) ? $data['product_attribute']: array())
 		);
+
+		$result['product_filter']   = (isset($product['product_filter'])) ? $product['product_filter'] : (isset($data['product_filter']) ? $data['product_filter'] : array());
+        //$this->log->write("initProduct" . print_r(result['product_filter'], true));
 
 		if (VERSION == '1.5.3.1') {
 			$result['product_tag'] = (isset($product['product_tag'])) ? $product['product_tag'] : (isset($data['product_tag']) ? $data['product_tag']: array());
@@ -1048,32 +1050,28 @@ class ModelToolExchange1c extends Model {
 		return $filter_id;
 	}
 
-	private function insertProductFilter($product_id, $filter) {
-		$this->log->write("insertProductFilter(". $product_id . ", ". print_r($filter,true).")");
-		$this->FILTERS[$product_id] = $filter;
-	}
+	private function insertCategoryFilters($product_id, $filters) {
+		$query = $this->db->query("SELECT `category_id` FROM `" .DB_PREFIX . "product_to_category` WHERE `product_id` = '" .$product_id."'");
+		if ($query->num_rows > 0) {
+			foreach ($query->rows as $row) {
+				$category_id = $row['category_id'];
+				foreach ($filters as $filter_id) {
+					$this->log->write("обновление фильтров категорий: category_id =" .$category_id. " product_id: " . $product_id . " filter_id: ". $filter_id);
 
-/*
-		foreach ($filter as $filter_id) {
-			$this->log->write("обновление фильтров: product_id: " . $product_id . " filter_id: ". $filter_id);
-
-			$query = $this->db->query("SELECT filter_id FROM `" . DB_PREFIX . "product_filter` WHERE filter_id = '" . $filter_id . "' and product_id = '" . $product_id . "'");
-			if ($query->num_rows) {
-				$this->log->write(" фильтр найден ");
-			}
-			else {
-				$this->log->write(" фильтр ненайден, создается новый ");
-				$sqlq = "INSERT INTO `product_filter` (`product_id`, `filter_id`) VALUES (". (int)$product_id.",". (int)$filter_id.")";
-				$this->db->query($sqlq);
-				$prod = $this->db->getLastId();
-				$t = mysql_error();
-				$this->log->write($sqlq);
-				$this->log->write("t: " . $t);
+					$querycat = $this->db->query("SELECT filter_id FROM `" . DB_PREFIX . "category_filter` WHERE filter_id = '" . $filter_id . "' and category_id = '" . $category_id . "'");
+					if ($querycat->num_rows) {
+						$this->log->write(" фильтр категории найден ");
+					}
+					else {
+						$this->log->write(" фильтр  категории не найден, создается новый ");
+						$sqlq = "INSERT INTO `category_filter` (`category_id`, `filter_id`) VALUES (". (int) $category_id.",". (int)$filter_id.")";
+						$this->db->query($sqlq);
+						$this->log->write($sqlq);
+					}
+				}
 			}
 		}
-
-*/
-
+	}
 
 	/**
 	 * Заполняет продуктами родительские категории
@@ -1160,6 +1158,9 @@ class ModelToolExchange1c extends Model {
 			if ($enable_log)
 				$this->log->write('TRUNCATE TABLE `' . DB_PREFIX . 'product_reward`');
 			$this->db->query('TRUNCATE TABLE `' . DB_PREFIX . 'product_special`');
+			if ($enable_log)
+				$this->log->write('TRUNCATE TABLE `' . DB_PREFIX . 'product_filter`');
+			$this->db->query('TRUNCATE TABLE `' . DB_PREFIX . 'product_filter`');
 			if ($enable_log)
 				$this->log->write('TRUNCATE TABLE `' . DB_PREFIX . 'product_special`');
 			$this->db->query('TRUNCATE TABLE `' . DB_PREFIX . 'product_to_1c`');
