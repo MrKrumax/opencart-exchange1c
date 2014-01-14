@@ -4,6 +4,7 @@ class ModelToolExchange1c extends Model {
 
 	private $CATEGORIES = array();
 	private $PROPERTIES = array();
+	private $FILTERS = array();
 
 
 	/**
@@ -292,6 +293,10 @@ class ModelToolExchange1c extends Model {
 				}
 
 				$data['status'] = 1;
+
+				$this->log->write("FILTERS:" . print_r($this->FILTERS,true));
+
+				$data['product_filter'] = $this->FILTERS[$product_id];
 				$this->updateProduct($data, $product_id, $language_id);
 
 				unset($data);
@@ -401,7 +406,7 @@ class ModelToolExchange1c extends Model {
 				if ($product->Описание) $data['description'] = (string)$product->Описание;
 				if ($product->Статус) $data['status'] = (string)$product->Статус;
 
-                unset($product_filter);
+				unset($product_filter);
 
 				// Свойства продукта
 				if ($product->ЗначенияСвойств) {
@@ -422,11 +427,11 @@ class ModelToolExchange1c extends Model {
 								continue;
 							}
 
-                            $filter_id = $this->getProductFilter($attribute['name'], $attribute_value);
+							$filter_id = $this->getProductFilter($attribute['name'], $attribute_value);
 							$product_filter[$filter_id] = $filter_id;
 
 							if ($enable_log)
-								$this->log->write("   > " . $attribute_value);
+				 				$this->log->write("   > " . $attribute_value);
 
 							switch ($attribute['name']) {
 
@@ -512,8 +517,7 @@ class ModelToolExchange1c extends Model {
 				$this->setProduct($data, $language_id);
 				if (isset($product_filter)) {
 					$product_id = $this->getProductIdBy1CProductId ($uuid[0]);
-//					$product_id = $this->get1CProductIdByProductId($product['product_id']);
-					$this->updateProductFilter($product_id, $product_filter);
+					$this->insertProductFilter($product_id, $product_filter);
 				}
 				unset($data);
 			}
@@ -566,7 +570,6 @@ class ModelToolExchange1c extends Model {
 	 *
 	 * @param	SimpleXMLElement
 	 * @param	int
-
 	 */
 	private function insertCategory($xml, $parent = 0, $language_id) {
 
@@ -1033,10 +1036,11 @@ class ModelToolExchange1c extends Model {
 	}
 
 	/**
-	 * Получает путь к картинке и накладывает водяные знаки
+	 * Получает id фильтра по имени
 	 *
 	 * @param	string
-	 * @return	string
+	 * @param	string
+	 * @return	int
 	 */
 	private function getProductFilter($filter_name, $filter_value) {
 		$group_id = $this->getFilterGroupIdByName($filter_name);
@@ -1044,25 +1048,32 @@ class ModelToolExchange1c extends Model {
 		return $filter_id;
 	}
 
-	private function updateProductFilter($product_id, $filter) {
-		$this->log->write("updateProductFilter");
+	private function insertProductFilter($product_id, $filter) {
+		$this->log->write("insertProductFilter(". $product_id . ", ". print_r($filter,true).")");
+		$this->FILTERS[$product_id] = $filter;
+	}
+
+/*
 		foreach ($filter as $filter_id) {
 			$this->log->write("обновление фильтров: product_id: " . $product_id . " filter_id: ". $filter_id);
 
 			$query = $this->db->query("SELECT filter_id FROM `" . DB_PREFIX . "product_filter` WHERE filter_id = '" . $filter_id . "' and product_id = '" . $product_id . "'");
 			if ($query->num_rows) {
 				$this->log->write(" фильтр найден ");
-				return false;
 			}
 			else {
 				$this->log->write(" фильтр ненайден, создается новый ");
-				$sqlq = "INSERT INTO `" .DB_PREFIX. "product_filter` SET product_id = '" . $product_id . "', filter_id = '" . $filter_id . "'";
+				$sqlq = "INSERT INTO `product_filter` (`product_id`, `filter_id`) VALUES (". (int)$product_id.",". (int)$filter_id.")";
 				$this->db->query($sqlq);
+				$prod = $this->db->getLastId();
+				$t = mysql_error();
 				$this->log->write($sqlq);
-				return true;
+				$this->log->write("t: " . $t);
 			}
 		}
-	}
+
+*/
+
 
 	/**
 	 * Заполняет продуктами родительские категории
